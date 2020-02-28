@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">DDClothsStore</string>
+    <string name="action_wishlist">Wishlist</string>
+    <string name="action_cart">Cart</string>
+    <string name="cart_total">Cart total</string>
+    <string name="cart_empty">Cart empty</string>
+    <string name="add_to_cart">Cart</string>
+    <string name="add_to_wishlist">Wishlist</string>
+    <string name="remove_from_cart">Remove Item</string>
+</resources>
