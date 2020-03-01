@@ -1,9 +1,18 @@
-package com.example.ddclothsstore.model;
+package com.example.ddclothsstore.model.database;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Product {
+
+    public static final String TABLE_NAME = "product";
+
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_CATEGORY = "category";
+    public static final String COLUMN_PRICE = "price";
+    public static final String COLUMN_OLDPRICE = "oldPrice";
+    public static final String COLUMN_STOCK = "stock";
 
     @SerializedName("id")
     @Expose
@@ -49,6 +58,19 @@ public class Product {
         this.oldPrice = oldPrice;
         this.stock = stock;
     }
+
+
+    // Create table SQL query
+    public static final String CREATE_TABLE =
+            "CREATE TABLE " + TABLE_NAME + "("
+                    + COLUMN_ID + " INTEGER PRIMARY KEY,"
+                    + COLUMN_NAME + " TEXT,"
+                    + COLUMN_CATEGORY + " TEXT,"
+                    + COLUMN_PRICE + " TEXT,"
+                    + COLUMN_OLDPRICE + " TEXT,"
+                    + COLUMN_STOCK + " INTEGER"
+                    + ")";
+
 
     public int getId() {
         return id;

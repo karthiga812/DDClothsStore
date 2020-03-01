@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ddclothsstore.R;
 import com.example.ddclothsstore.model.ApiService;
-import com.example.ddclothsstore.model.CartItem;
+import com.example.ddclothsstore.model.database.CartItem;
 import com.example.ddclothsstore.model.NetworkClient;
-import com.example.ddclothsstore.model.Product;
+import com.example.ddclothsstore.model.database.Product;
 import com.example.ddclothsstore.model.ResourceManager;
 import com.example.ddclothsstore.view.adapter.CartRecycleviewAdapter;
 
@@ -68,39 +68,34 @@ public class CartListFragment extends Fragment {
 
     public void getCartItems(List<CartItem> cartItems){
 
-        ResourceManager resourceManager = ResourceManager.getInstance();
+        ResourceManager resourceManager = ResourceManager.getInstance(getActivity());
         resourceManager.setCartItems(cartItems);
 
-        productsInCart = new ArrayList<Product>(cartItems.size());
-        List<Product> productsList = ((ProductListActivity)getActivity()).getProductsList();
-        for(CartItem cartItem : cartItems){
-            for(Product product:productsList){
-                if(product.getId() == cartItem.getProductId()){
-                    productsInCart.add(product);
-                    break;
-                }
-            }
-
-        }
+        productsInCart = resourceManager.getProductsInCart();
         generateDataList();
         calculateAndSetCartTotal();
     }
 
 
     private void generateDataList() {
+
         // set up the RecyclerView
         RecyclerView recyclerView = getActivity().findViewById(R.id.recycleview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        CartRecycleviewAdapter adapter = new CartRecycleviewAdapter(getActivity(), productsInCart);
-        //Toast.makeText(getActivity(),"list size " + productList.size(),Toast.LENGTH_LONG).show();
+        CartRecycleviewAdapter adapter = null;
+        if(productsInCart != null){
+            adapter= new CartRecycleviewAdapter(getActivity(), productsInCart);
+        }
         recyclerView.setAdapter(adapter);
     }
 
     private void calculateAndSetCartTotal(){
         float cartTotal = 0;
 
-        for(Product product:productsInCart){
-            cartTotal += Float.parseFloat(product.getPrice());
+        if(productsInCart != null){
+            for(Product product:productsInCart){
+                cartTotal += Float.parseFloat(product.getPrice());
+            }
         }
 
         TextView tvCartTotal = (TextView) getActivity().findViewById(R.id.cart_total);
@@ -118,7 +113,7 @@ public class CartListFragment extends Fragment {
     public void removeItemsFromCart(final int productId){
 
         int toBeRemovedItem = 0;
-        ResourceManager resourceManager = ResourceManager.getInstance();
+        ResourceManager resourceManager = ResourceManager.getInstance(getActivity());
         List<CartItem> cartItems = resourceManager.getCartItems();
         for (CartItem cartItem : cartItems){
             if(cartItem.getProductId() == productId){
@@ -134,7 +129,7 @@ public class CartListFragment extends Fragment {
             public void onResponse(Call<CartItem> call, Response<CartItem> response) {
 
                 if(response.isSuccessful()) {
-                    Log.i(NetworkClient.TAG, "delete submitted to API." );
+                    Log.i(NetworkClient.TAG, "Removed item from cart" );
                 }
                 getCartProductsList();
             }

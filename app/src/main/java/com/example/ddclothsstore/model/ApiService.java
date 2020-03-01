@@ -1,5 +1,8 @@
 package com.example.ddclothsstore.model;
 
+import com.example.ddclothsstore.model.database.CartItem;
+import com.example.ddclothsstore.model.database.Product;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -12,12 +15,6 @@ import retrofit2.http.Query;
 public interface ApiService {
 
     public static final String API_KEY = "dd09d278cf-87dd-46b6-b0cb-97248c18b968";
-
-    /*@GET("users/{user}/repos")
-    Call<List<Product>> getProductsList(@Path("user") String user);
-
-    @GET("/cloths/products")
-    Call<List<Product>> getProductData(@Query("X-API_KEY") String apiKey);*/
 
     @GET("/cloths/products")
     Call<List<Product>> getProductData(@Header("X-API-KEY") String api_key);

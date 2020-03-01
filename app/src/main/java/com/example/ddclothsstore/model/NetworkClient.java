@@ -2,6 +2,8 @@ package com.example.ddclothsstore.model;
 
 import android.util.Log;
 
+import com.example.ddclothsstore.model.database.Product;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,54 +39,5 @@ public class NetworkClient {
         }
         return retrofit;
     }
-
-    public List<Product> getProductsList(){
-
-
-        ApiService service = NetworkClient.getRetrofitInstance().create(ApiService.class);
-        Call<List<Product>> call = service.getProductData(ApiService.API_KEY);
-
-        call.enqueue(new Callback<List<Product>>() {
-            @Override
-            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-
-                productList = response.body();
-            }
-
-            @Override
-            public void onFailure(Call<List<Product>> call, Throwable t) {
-
-                Log.e(NetworkClient.TAG,"Failed to download products list");
-            }
-        });
-
-        return  productList;
-    }
-
-    /*public List<Product> getProductsList(){
-
-        List<Product> productList = null;
-        ProductListResponse respond = null;
-        *//*Create handle for the RetrofitInstance interface*//*
-        ApiService service = NetworkClient.getRetrofitInstance().create(ApiService.class);
-
-        Call<ProductListResponse> callSync = service.getProductData(ApiService.API_KEY);
-
-        try {
-            Response<ProductListResponse> response = callSync.execute();
-            respond = response.body();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        productList = respond.items;
-
-        return productList;
-    }
-
-    public class ProductListResponse {
-
-        private List<Product> items;
-    }*/
 
 }

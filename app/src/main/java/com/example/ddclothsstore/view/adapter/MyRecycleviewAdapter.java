@@ -5,13 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ddclothsstore.R;
-import com.example.ddclothsstore.model.Product;
+import com.example.ddclothsstore.model.database.Product;
 import com.example.ddclothsstore.view.ui.ClickCallback;
 
 import java.util.List;
@@ -22,8 +23,10 @@ public class MyRecycleviewAdapter extends RecyclerView.Adapter<MyRecycleviewAdap
     private LayoutInflater layoutInflater = null;
     private ViewGroup parent = null;
     private ClickCallback clickCallbacks = null;
+    private Context context = null;
 
     public MyRecycleviewAdapter(Context context, List<Product> products){
+        this.context = context;
         clickCallbacks = (ClickCallback) context;
         layoutInflater = LayoutInflater.from(context);
         this.products = products;
@@ -43,8 +46,18 @@ public class MyRecycleviewAdapter extends RecyclerView.Adapter<MyRecycleviewAdap
         holder.tvName.setText(product.getName());
         holder.tvCategory.setText(product.getCategory());
         holder.tvPrice.setText(product.getPrice());
-        holder.tvOldPrice.setText(product.getOldPrice());
-        holder.tvStock.setText(String.valueOf(product.getStock()));
+        String strOldPrice = product.getOldPrice();
+        if(strOldPrice == null || strOldPrice.length() == 0){
+            holder.oldPriceLayout.setVisibility(View.INVISIBLE);
+        } else {
+            holder.oldPriceLayout.setVisibility(View.VISIBLE);
+            holder.tvOldPrice.setText(strOldPrice);
+        }
+        int iStockStr = R.string.in_stock;
+        if(product.getStock()<=0){
+            iStockStr = R.string.out_of_stock;
+        }
+        holder.tvStock.setText(context.getString(iStockStr));
         holder.btnAdToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,6 +83,7 @@ public class MyRecycleviewAdapter extends RecyclerView.Adapter<MyRecycleviewAdap
         private TextView tvCategory = null;
         private TextView tvPrice = null;
         private TextView tvOldPrice = null;
+        private LinearLayout oldPriceLayout = null;
         private TextView tvStock = null;
         private Button btnAdToCart = null;
         private Button btnAdToWishlist = null;
@@ -79,6 +93,7 @@ public class MyRecycleviewAdapter extends RecyclerView.Adapter<MyRecycleviewAdap
             tvName = itemView.findViewById(R.id.name);
             tvCategory = itemView.findViewById(R.id.category);
             tvPrice = itemView.findViewById(R.id.price);
+            oldPriceLayout = itemView.findViewById(R.id.oldPrice_layout);
             tvOldPrice = itemView.findViewById(R.id.oldprice);
             tvStock = itemView.findViewById(R.id.stock);
             btnAdToCart = itemView.findViewById(R.id.addToCart);

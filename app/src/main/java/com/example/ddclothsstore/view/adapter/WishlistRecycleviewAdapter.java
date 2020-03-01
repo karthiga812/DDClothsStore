@@ -16,13 +16,13 @@ import com.example.ddclothsstore.view.ui.ClickCallback;
 
 import java.util.List;
 
-public class CartRecycleviewAdapter extends RecyclerView.Adapter<CartRecycleviewAdapter.ViewHolder> {
+public class WishlistRecycleviewAdapter extends RecyclerView.Adapter<WishlistRecycleviewAdapter.ViewHolder> {
 
     private List<Product> products = null;
     private LayoutInflater layoutInflater = null;
     private ClickCallback clickCallbacks = null;
 
-    public CartRecycleviewAdapter(Context context, List<Product> products){
+    public WishlistRecycleviewAdapter(Context context, List<Product> products){
         clickCallbacks = (ClickCallback) context;
         layoutInflater = LayoutInflater.from(context);
         this.products = products;
@@ -30,19 +30,25 @@ public class CartRecycleviewAdapter extends RecyclerView.Adapter<CartRecycleview
 
     @NonNull
     @Override
-    public CartRecycleviewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = layoutInflater.inflate(R.layout.cart_recycleview_element, parent, false);
-        return new CartRecycleviewAdapter.ViewHolder(view);
+    public WishlistRecycleviewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = layoutInflater.inflate(R.layout.wishlist_recycleview_element, parent, false);
+        return new WishlistRecycleviewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CartRecycleviewAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull WishlistRecycleviewAdapter.ViewHolder holder, final int position) {
         final Product product = products.get(position);
         holder.tvName.setText(product.getName());
         holder.tvPrice.setText(product.getPrice());
-        holder.tvOldPrice.setText(product.getOldPrice());
 
-        holder.btnRemoveFromCart.setOnClickListener(new View.OnClickListener() {
+        holder.btnRemoveFromWishlist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickCallbacks.onButtonClick(v,product.getId());
+            }
+        });
+
+        holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clickCallbacks.onButtonClick(v,product.getId());
@@ -59,15 +65,15 @@ public class CartRecycleviewAdapter extends RecyclerView.Adapter<CartRecycleview
 
         private TextView tvName = null;
         private TextView tvPrice = null;
-        private TextView tvOldPrice = null;
-        private Button btnRemoveFromCart = null;
+        private Button btnRemoveFromWishlist = null;
+        private Button btnAddToCart = null;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.name);
             tvPrice = itemView.findViewById(R.id.price);
-            tvOldPrice = itemView.findViewById(R.id.oldprice);
-            btnRemoveFromCart = itemView.findViewById(R.id.removeFromCart);
+            btnRemoveFromWishlist = itemView.findViewById(R.id.removeFromWishlist);
+            btnAddToCart = itemView.findViewById(R.id.moveFromWishlistToCart);
         }
     }
 }

@@ -8,28 +8,26 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <TextView
-            android:id="@+id/price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/oldprice"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/moveFromWishlistToCart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
-    </LinearLayout>
-
-
+            android:text="@string/add_to_cart"
+            android:onClick="onButtonClick"/>
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/removeFromCart"
+            android:id="@+id/removeFromWishlist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/remove"
             android:onClick="onButtonClick"/>
-
+    </LinearLayout>
 </LinearLayout>

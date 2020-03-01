@@ -5,7 +5,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,15 +13,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.ddclothsstore.R;
-import com.example.ddclothsstore.model.Product;
+import com.example.ddclothsstore.model.database.Product;
 
 import java.util.List;
 
-public class ProductListActivity extends AppCompatActivity implements ClickCallback {
+public class ProductListActivity extends AppCompatActivity implements ClickCallback{
 
     List<Product> productsList = null;
     ProductListFragment productListFragment = null;
     CartListFragment cartListFragment = null;
+    WishlistFragment wishlistFragment = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,9 +34,8 @@ public class ProductListActivity extends AppCompatActivity implements ClickCallb
         setSupportActionBar(myToolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         addProductListFragment();
+
     }
 
     @Override
@@ -50,12 +49,15 @@ public class ProductListActivity extends AppCompatActivity implements ClickCallb
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         switch (item.getItemId()) {
+            case android.R.id.home:
+                addProductListFragment();
+                return true;
             case R.id.action_cart:
                 addCartListFragment();
                 return true;
 
             case R.id.action_wishlist:
-
+                addWishListFragment();
                 return true;
 
             default:
@@ -64,6 +66,7 @@ public class ProductListActivity extends AppCompatActivity implements ClickCallb
         }
     }
 
+
    private void addProductListFragment(){
 
         if(productListFragment == null){
@@ -71,11 +74,14 @@ public class ProductListActivity extends AppCompatActivity implements ClickCallb
         }
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-       transaction.add(R.id.fragment_container, productListFragment);
+       transaction.replace(R.id.fragment_container, productListFragment);
        transaction.addToBackStack(null);
 
        transaction.commit();
-       Toast.makeText(this,"fragment added ",Toast.LENGTH_LONG).show();
+
+       getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+       getSupportActionBar().setTitle(getString(R.string.app_name));
+
    }
 
     private void addCartListFragment(){
@@ -89,22 +95,29 @@ public class ProductListActivity extends AppCompatActivity implements ClickCallb
         transaction.addToBackStack(null);
 
         transaction.commit();
-        Toast.makeText(this,"fragment added ",Toast.LENGTH_LONG).show();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(getString(R.string.action_cart));
+
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
+    private void addWishListFragment(){
+
+        if(wishlistFragment == null){
+            wishlistFragment = new WishlistFragment();
+        }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        transaction.replace(R.id.fragment_container, wishlistFragment);
+        transaction.addToBackStack(null);
+
+        transaction.commit();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(getString(R.string.action_wishlist));
+
     }
 
-    public void setProductsList(List<Product> productsList) {
-        this.productsList = productsList;
-    }
-
-    public List<Product> getProductsList() {
-        return productsList;
-    }
 
     @Override
     public void onButtonClick(View view, int id) {
@@ -114,11 +127,17 @@ public class ProductListActivity extends AppCompatActivity implements ClickCallb
                 productListFragment.addItemsToCart(id);
                 break;
             case R.id.addToWishlist:
+                productListFragment.addItemsToWishlist(id);
                 break;
             case R.id.removeFromCart:
                 cartListFragment.removeItemsFromCart(id);
                 break;
-
+            case R.id.removeFromWishlist:
+                wishlistFragment.removeItemsFromWishlist(id);
+                break;
+            case R.id.moveFromWishlistToCart:
+                wishlistFragment.addItemsToCart(id);
+                break;
         }
 
     }

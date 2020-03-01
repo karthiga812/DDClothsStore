@@ -15,11 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ddclothsstore.R;
 import com.example.ddclothsstore.model.ApiService;
-import com.example.ddclothsstore.model.database.CartItem;
 import com.example.ddclothsstore.model.NetworkClient;
-import com.example.ddclothsstore.model.database.Product;
 import com.example.ddclothsstore.model.ResourceManager;
-import com.example.ddclothsstore.view.adapter.MyRecycleviewAdapter;
+import com.example.ddclothsstore.model.database.CartItem;
+import com.example.ddclothsstore.model.database.Product;
+import com.example.ddclothsstore.model.database.WishlistItem;
+import com.example.ddclothsstore.view.adapter.WishlistRecycleviewAdapter;
 
 import java.util.List;
 
@@ -27,60 +28,61 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProductListFragment extends Fragment  {
+public class WishlistFragment extends Fragment {
+
+    private List<Product> productsInWishlist = null;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Toast.makeText(getActivity(),"fragment",Toast.LENGTH_LONG).show();
-
-        return inflater.inflate(R.layout.productlistfragment, container, false);
-
+        return inflater.inflate(R.layout.cartlistfragment, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ((ProductListActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        ((ProductListActivity)getActivity()).getSupportActionBar().setTitle(getString(R.string.app_name));
-        getProductsList();
 
+        getWishlistProductsList();
     }
 
-    public void getProductsList(){
-
-
-        ApiService service = NetworkClient.getRetrofitInstance().create(ApiService.class);
-        Call<List<Product>> call = service.getProductData(ApiService.API_KEY);
-
-        call.enqueue(new Callback<List<Product>>() {
-            @Override
-            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-
-                generateDataList(response.body());
-            }
-
-            @Override
-            public void onFailure(Call<List<Product>> call, Throwable t) {
-
-                Log.e(NetworkClient.TAG,"Failed to download products list");
-            }
-        });
-
-    }
-
-    private void generateDataList(List<Product> productList) {
+    public void getWishlistProductsList(){
 
         ResourceManager resourceManager = ResourceManager.getInstance(getActivity());
-        resourceManager.setProducts(productList);
+        resourceManager.setWishlistItems();
+        productsInWishlist = resourceManager.getProductsInWishlist();
+        generateDataList();
+    }
+
+
+    private void generateDataList() {
+
         // set up the RecyclerView
         RecyclerView recyclerView = getActivity().findViewById(R.id.recycleview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        MyRecycleviewAdapter adapter = new MyRecycleviewAdapter(getActivity(), productList);
-        //Toast.makeText(getActivity(),"list size " + productList.size(),Toast.LENGTH_LONG).show();
+        WishlistRecycleviewAdapter adapter = null;
+        if(productsInWishlist != null){
+            adapter= new WishlistRecycleviewAdapter(getActivity(), productsInWishlist);
+        }
         recyclerView.setAdapter(adapter);
+
     }
 
+
+    public void removeItemsFromWishlist(final int productId){
+
+        int toBeRemovedItem = 0;
+        ResourceManager resourceManager = ResourceManager.getInstance(getActivity());
+        List<WishlistItem> wishlistItems = resourceManager.getWishlistItems();
+        for (WishlistItem wishlistItem : wishlistItems){
+            if(wishlistItem.getProductId() == productId){
+                toBeRemovedItem = wishlistItem.getId();
+                break;
+            }
+        }
+        resourceManager.removeProductsFromWishlist(toBeRemovedItem);
+        getWishlistProductsList();
+
+    }
 
     public void addItemsToCart(final int productId){
 
@@ -89,6 +91,7 @@ public class ProductListFragment extends Fragment  {
             Toast.makeText(getActivity(),"Out of Stock product cannot be added to cart",Toast.LENGTH_LONG).show();
             return;
         }
+
         ApiService service = NetworkClient.getRetrofitInstance().create(ApiService.class);
         Call<CartItem> call = service.addProductsToCart(ApiService.API_KEY, productId);
         Log.i(NetworkClient.TAG, "url = " + call.request().url());
@@ -98,6 +101,7 @@ public class ProductListFragment extends Fragment  {
 
                 if(response.isSuccessful()) {
                     Log.i(NetworkClient.TAG, "post submitted to API." + response.body().toString());
+                    removeItemsFromWishlist(productId);
                 }
             }
 
@@ -107,14 +111,6 @@ public class ProductListFragment extends Fragment  {
                 Log.e(NetworkClient.TAG,"Failed to add item to cart");
             }
         });
-
     }
-
-    public void addItemsToWishlist(final int productId){
-
-        ResourceManager resourceManager = ResourceManager.getInstance(getActivity());
-        resourceManager.addProductsToWishlist(productId);
-    }
-
 
 }
